@@ -47,7 +47,8 @@
                 valid: undefined,
                 model: {
                     name: "",
-                    password: ""
+                    password: "",
+                    vCode:""
                 },
                 fields: [
                     {
@@ -74,7 +75,7 @@
                     },
                     {
                         type: "input",
-                        modelKey: "password",
+                        modelKey: "vCode",
                         label: "验证码",
                         props: {
                             placeholder: "请输入验证码"
@@ -90,15 +91,16 @@
             submitHandler(e) {
                 alert(
                     this.model.name +
-                    "*****" +
+                    "**" +
                     this.model.password +
-                    "***"
+                    "**" +
+                        this.model.vCode +"**"
                         + this.vCodeUrl
                 );
-                this.$axios.post('http://192.168.1.105:8000/login',{
+                this.axios.post(this.loginUrl,{
                     username:this.model.name,
-                    password:this.model.password
-
+                    password:this.model.password,
+                    vCode:this.model.vCode
                 })
                     .then(response =>{
                         alert(response.data);

@@ -30,7 +30,7 @@ const index = new Vuex.Store({
 })*/
 
 const state={//要设置的全局访问的state对象
-    baseUrl:"http://192.168.1.105:8000/",
+    baseUrl:"http://192.168.50.239:8000/",
     test:1
     //要设置的初始属性值
 };
