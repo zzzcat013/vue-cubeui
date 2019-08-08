@@ -1,17 +1,27 @@
 <template>
     <div class="LoginInfor">
         <div class="content">
-            <cube-form :model="model" @validate="validateHandler" @submit="submitHandler">
+            <cube-form ref="loginForm" :model="model"   @validate="validateHandler"  @submit="submitHandler">
                 <cube-form-group>
                     <cube-form-item :field="fields[0]"></cube-form-item>
                     <cube-form-item :field="fields[1]"></cube-form-item>
                     <cube-form-item :field="fields[2]"> </cube-form-item>
-                    <cube-form-item :field="fields[3]">
+                    <div>
+                        <cube-input  v-model="model.code" ></cube-input>
                         <div class="login-code">
-                            <img :src="codeUrl"  alt="validCode" class="cube-btn-inline" @click="getCode">
+                            <img :src="codeUrl"  alt="validCode"  @click="getCode">
                         </div>
-                    </cube-form-item>
+                    </div>
 
+<!--                    <cube-form-item :field="fields[3]">
+                        <div class="login-code">
+                            <img :src="codeUrl"  alt="validCode"  @click="getCode">
+                        </div>
+                    </cube-form-item>-->
+                    <cube-checkbox v-model="model.rememberMe" position="right" shape="square" :hollow-style="true">
+                        Styled Checkbox
+                    </cube-checkbox>
+                    <!--<cube-form-item :field="fields[3]"></cube-form-item>-->
 
                 </cube-form-group>
 
@@ -39,27 +49,34 @@
 <script>
     //import {getCodeImg} from "../api/login";
     import qs from "qs"
+
     export default {
         name: "login",
         created() {
-
             this.getCode()
+            this.getCookie()
         },
         data() {
             return {
-                isReg: false,
+                validity: {},
+                valid: undefined,
                 cookiePass: '',
-                maxlength: 30,
                 codeUrl:"",
                 loginUrl:this.$store.state.baseUrl+"/auth/login",
                 vCodeUrl:this.$store.state.baseUrl+"/auth/vCode",
-                validity: {},
-                valid: undefined,
+                loginRules: {
+                    username: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
+                    password: [{ required: true, trigger: 'blur', message: '密码不能为空' }],
+                    code: [{ required: true, trigger: 'change', message: '验证码不能为空' }]
+                },
+                loading: false,
+                redirect: undefined,
                 model: {
                     username: "",
                     password: "",
                     code:"",
-                    uuid:""
+                    uuid:"",
+                    rememberMe: false
                 },
                 fields: [
                     {
@@ -93,6 +110,18 @@
                         },
                         rules: {
                             required: true
+                        }
+                    },
+                    {
+                        type: "checkbox",
+                        modelKey: "rememberMe",
+                        option: {
+                            shape:"square",
+                            label: '记住我',
+                            value: true
+                        },
+                        rules: {
+                            required: false
                         }
                     }
                 ]
@@ -136,15 +165,16 @@
 
                 //由于axios默认发送数据时，数据格式是Request Payload，而并非我们常用的Form Data格式，PHP后端未必能正常获取到，所以在发送之前，需要使用qs模块对其进行处理。
                 //this.axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-                alert(
+                /*alert(
                     this.model.username +
                     "**" +
                     this.model.password +
                     "**" +
                     this.model.code +"**"
                     + this.model.uuid
-                );
+                );*/
                 // 新创建 axios 实例配置
+
                 const $axios = this.axios.create({
                     baseURL: this.$store.state.baseURL,
                     timeout: 50000,
@@ -161,37 +191,34 @@
                         password:this.model.password,
                         code:this.model.code,
                         uuid:this.model.uuid
-                }
-
+                    }
                 }).then(response => {
-                    alert("interceptors response"+response.data.toString)
-                    alert("login ok")
+                    //alert("response.status="+response.status)
+                    if (response.status===200){
+                        console.log("response data:"+ JSON.stringify(response.data))
+
+                        this.$router.push({path:"/"});  //登录成功后页面跳转
+                    }
+
                 }).catch(err => {
-                    console.log('Error Info:' + JSON.stringify(err))
+                    let errTxt=err.name+":"+err.message
+                    this.$refs["loginForm"].reset() //发生错误，重置表单
+
+                    const toast = this.$createToast({
+                        time: 2000,
+                        txt: errTxt,
+                        type:'error',
+                        mask:true
+                    })
+                    toast.show()
+
+                    //console.log('Error Info:' + JSON.stringify(err))
                 })
-                alert(
-                    this.model.username + " login !!!"
-                );
-/*                this.axios.post(this.loginUrl,this.model)
-                    .then(response =>{
-                        alert(response.data);
-                        console.log(response.data)
-
-                    });*/
-                //验证姓名和密码是否与locastorage一致
-                //localStorage.getItem("name") === this.model.name &&
-                //localStorage.getItem("password") === this.model.password
-
-/*                if (this.model.name=="admin" && this.model.password=="123456"  ) {
-                    alert("login ok")
-                    this.$router.push("/#/login");
-                } else {
-                    alert('用户名或密码不正确');
-                }*/
             },
             validateHandler(result) {
-                this.validity = result.validity;
-                this.valid = result.valid;
+                this.validity = result.validity
+                this.valid = result.valid
+                console.log('validity', result.validity, result.valid, result.dirty, result.firstInvalidFieldIndex)
             }
         }
 

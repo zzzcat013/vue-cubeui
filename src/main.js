@@ -7,6 +7,7 @@ import store from './store'  //在main.js中引用新建的store.js,并在实例
 import VueCookies from 'vue-cookies'
 import SvgIcon from 'vue-svgicon'
 
+
 // Default tag name is 'svgicon'
 Vue.use(SvgIcon, {
     tagName: 'svg-icon'
