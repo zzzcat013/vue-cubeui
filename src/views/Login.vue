@@ -5,28 +5,41 @@
                 <cube-form-group>
                     <cube-form-item :field="fields[0]"></cube-form-item>
                     <cube-form-item :field="fields[1]"></cube-form-item>
-                    <cube-form-item :field="fields[2]"> </cube-form-item>
-                    <div>
-                        <cube-input  v-model="model.code" ></cube-input>
-                        <div class="login-code">
-                            <img :src="codeUrl"  alt="validCode"  @click="getCode">
-                        </div>
+
+                    <div class="code">
+                        <cube-form-item :field="fields[2]"></cube-form-item>
+                            <div class="login-code">
+                                <img :src="codeUrl"  alt="validCode"  @click="getCode">
+                            </div>
                     </div>
+
+
+
+<!--                    <cube-form-item >
+                        <ul>
+                            <li class="list-unstyled list-inline"><label>验证码</label></li>
+                            <li><cube-input  v-model="model.code" laebl="验证码" placeholder="验证码" style="width: 63%" @keyup.enter.native="submitHandler"></cube-input></li>
+                            <li><div class="login-code">
+                                <img :src="codeUrl"  alt="validCode"  @click="getCode"></div>
+                            </li>
+                        </ul>
+
+                    </cube-form-item>-->
 
 <!--                    <cube-form-item :field="fields[3]">
                         <div class="login-code">
                             <img :src="codeUrl"  alt="validCode"  @click="getCode">
                         </div>
                     </cube-form-item>-->
-                    <cube-checkbox v-model="model.rememberMe" position="right" shape="square" :hollow-style="true">
-                        Styled Checkbox
+                    <cube-checkbox v-model="model.rememberMe" position="center" shape="square" :hollow-style="true">
+                        记住我
                     </cube-checkbox>
                     <!--<cube-form-item :field="fields[3]"></cube-form-item>-->
 
                 </cube-form-group>
 
                 <cube-form-group>
-                    <cube-button type="button" @click="submitHandler">登录</cube-button>
+                    <cube-button type="button"  @click="submitHandler">登录</cube-button>
                 </cube-form-group>
             </cube-form>
         </div>
@@ -214,6 +227,7 @@
 
                     //console.log('Error Info:' + JSON.stringify(err))
                 })
+                return false;
             },
             validateHandler(result) {
                 this.validity = result.validity
@@ -260,6 +274,21 @@
         justify-content: center;
     }
 
+    }
+    .login-code {
+        width: 33%;
+        display: inline-block;
+        height: 38px;
+        float: right;
+    img {
+        cursor: pointer;
+        vertical-align: middle
+    }
+    }
+    .code {
+        flex: 1 1 auto;
+
+        display: flex;
     }
 
 </style>
